@@ -32,3 +32,12 @@ export default function RootLayout({
     </html>
   );
 }
+import '@fontsource/prompt/400.css';
+import '@fontsource/prompt/700.css';
+
+// app/layout.tsx
+import { Playfair_Display } from 'next/font/google';
+const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
+
+<body className={`${playfair.variable} font-sans`}>
+</body>

@@ -1,103 +1,175 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [isOpen, setIsOpen] = useState(false);
+  const [languageOpen, setLanguageOpen] = useState(false);
+  const langRef = useRef(null);
+  const menuRef = useRef(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
+  const sections = [
+    {
+      title: 'ลักษณ์มีกฤชณะ',
+      description: 'รักแท้และโชคลาภอันไม่มีที่สิ้นสุด',
+      image: '/images/hero-full.png',
+    },
+    {
+      title: 'เทพแห่งความมั่งคั่ง',
+      description: 'เสริมพลังแห่งโชคลาภ ความร่ำรวย',
+      image: '/images/hero-wealth.png',
+    },
+  ];
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (langRef.current && !(langRef.current as HTMLElement).contains(event.target as Node)) {
+        setLanguageOpen(false);
+      }
+      if (menuRef.current && !(menuRef.current as HTMLElement).contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <main className="bg-[#FAF7F5] font-sans min-h-screen">
+      {/* ✅ Navbar */}
+      <header className="fixed top-0 left-0 w-full z-50 bg-white/70 backdrop-blur-md shadow-sm transition-all">
+        <div className="max-w-7xl mx-auto px-6 py-4 grid grid-cols-3 items-center font-playfair">
+          
+          {/* ซ้าย: ภาษา (Dropdown) */}
+          <div className="relative" ref={langRef}>
+  <button
+    onClick={() => setLanguageOpen(!languageOpen)}
+    className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-red-500 transition-colors duration-200 px-3 py-1.5 rounded-md hover:bg-gray-100"
+  >
+    🇹🇭 ไทย
+    <svg className="w-3 h-3 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+    </svg>
+  </button>
+
+  {languageOpen && (
+    <motion.div
+      initial={{ opacity: 0, y: -5 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -5 }}
+      transition={{ duration: 0.2 }}
+      className="absolute left-0 mt-2 w-36 bg-white shadow-lg ring-1 ring-black/10 rounded-xl z-50"
+    >
+      <ul className="py-2 text-sm text-gray-700">
+        <li>
           <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/th"
+            onClick={() => setLanguageOpen(false)}
+            className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 hover:text-red-500 transition rounded-md"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
+            🇹🇭 ไทย
           </a>
+        </li>
+        <li>
           <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/en"
+            onClick={() => setLanguageOpen(false)}
+            className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 hover:text-red-500 transition rounded-md"
           >
-            Read our docs
+            🇬🇧 English
           </a>
+        </li>
+      </ul>
+    </motion.div>
+  )}
+</div>
+
+
+          {/* กลาง: โลโก้ (ข้อความหรือเปลี่ยนเป็นรูป Image ก็ได้) */}
+          <div className="flex justify-center">
+            <p className="text-xl font-semibold text-black tracking-wide">Lucky Home</p>
+          </div>
+
+          {/* ขวา: เข้าสู่ระบบ + เมนู */}
+          <div className="flex justify-end items-center space-x-4" ref={menuRef}>
+            <a href="#" className="text-sm text-gray-700 hover:text-red-500 transition">เข้าสู่ระบบ</a>
+            <button
+              className="text-2xl text-gray-800 hover:text-red-500 transition duration-200"
+              onClick={() => setIsOpen(!isOpen)}
+              aria-label="Toggle menu"
+            >
+              ☰
+            </button>
+          </div>
+
+          {/* เมนู Dropdown */}
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="absolute top-16 right-6 w-56 bg-white rounded-xl shadow-xl p-5 space-y-3 text-sm z-50 font-sans"
+            >
+              {['หน้าหลัก', 'ดูของของฉัน', 'ประวัติการสั่งซื้อ', 'ติดต่อแอดมิน'].map((item, index) => (
+                <a
+                  href="#"
+                  key={index}
+                  className="block text-gray-700 hover:text-red-500 transition-colors duration-200"
+                >
+                  {item}
+                </a>
+              ))}
+            </motion.div>
+          )}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      </header>
+
+      {/* ✅ Main Sections */}
+      <div className="pt-24 px-4">
+        <div className="space-y-24 max-w-7xl mx-auto">
+          {sections.map((section, i) => (
+            <motion.section
+              key={i}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              viewport={{ once: true }}
+              className={`relative flex justify-center items-center ${i === 0 ? 'mb-8' : ''}`}
+            >
+              <div className="relative w-full h-[600px] rounded-[40px] overflow-hidden shadow-2xl">
+                <Image
+                  src={section.image}
+                  alt={section.title}
+                  layout="fill"
+                  objectFit="cover"
+                  className="absolute inset-0"
+                />
+                <div className="absolute inset-0 bg-white/70 backdrop-blur-sm" />
+                <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6 space-y-6">
+                  <h2 className="text-4xl md:text-5xl font-semibold text-black tracking-tight drop-shadow-sm">
+                    {section.title}
+                  </h2>
+                  <p className="text-lg md:text-xl text-gray-800 drop-shadow-sm max-w-2xl">
+                    {section.description}
+                  </p>
+                  <button className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-10 py-3 rounded-full text-lg font-medium shadow-md hover:scale-105 hover:brightness-110 transition duration-300">
+                    สั่งซื้อ
+                  </button>
+                </div>
+              </div>
+            </motion.section>
+          ))}
+        </div>
+      </div>
+
+      {/* ✅ Footer */}
+      <footer className="bg-white shadow-inner mt-24 py-6">
+        <div className="text-center text-sm text-gray-600">
+          &copy; {new Date().getFullYear()} LUCKYHOME. All rights reserved.
+        </div>
       </footer>
-    </div>
+    </main>
   );
 }
