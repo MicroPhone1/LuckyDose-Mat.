@@ -1,16 +1,13 @@
-// tailwind.config.ts (ถ้าใช้ TypeScript)
+// tailwind.config.ts
+
 const config = {
-  content: [
-    './app/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './pages/**/*.{ts,tsx}',
-  ],
+  content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
   theme: {
     extend: {
       fontFamily: {
-        playfair: ['var(--font-playfair)', 'serif'],
         sans: ['var(--font-geist-sans)', 'sans-serif'],
         mono: ['var(--font-geist-mono)', 'monospace'],
+        playfair: ['var(--font-playfair)', 'serif'],
       },
       colors: {
         background: 'var(--background)',
@@ -18,7 +15,7 @@ const config = {
       },
     },
   },
-  darkMode: 'media', // หรือ 'class' ถ้าต้องการใช้ class-based toggle
+  darkMode: 'media',
   plugins: [],
 };
 
