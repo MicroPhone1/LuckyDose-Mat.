@@ -1,10 +1,9 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Loader2, AlertCircle, Wand2 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
 
 // Types
 type Result = {
@@ -25,13 +24,12 @@ type Result = {
   raw?: string;
 };
 
-// Reusable card section
+// Card UI
 const SectionCard = ({
   title,
   children,
   border = 'border-purple-500',
   bg = 'bg-[#392B52]/40',
-  ...props
 }: {
   title: React.ReactNode;
   children: React.ReactNode;
@@ -43,23 +41,24 @@ const SectionCard = ({
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.6 }}
     className={`rounded-lg p-5 ${bg} ${border} shadow-md overflow-y-auto max-h-60`}
-    {...props}
   >
     <h2 className="font-semibold text-base mb-2 flex items-center gap-2">{title}</h2>
     {children}
   </motion.section>
 );
 
-// Component สำหรับแสดงข้อมูลโปรไฟล์
+// Text info row
 const Detail = ({ label, value }: { label: string; value: string }) => (
   <p className="text-sm">
     <span className="text-purple-300 font-semibold drop-shadow-md">{label}:</span> {value || '-'}
   </p>
 );
 
-// Main page
 export default function AiAnalysisPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // 🧠 Parameters
   const fullName = searchParams.get('fullName') || '';
   const birthDate = searchParams.get('birthDate') || '';
   const phone = searchParams.get('phone') || '';
@@ -67,6 +66,7 @@ export default function AiAnalysisPage() {
   const gender = searchParams.get('gender') || '';
   const theme = searchParams.get('theme') || '';
 
+  // 📊 Data states
   const [result, setResult] = useState<Result | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -77,7 +77,6 @@ export default function AiAnalysisPage() {
         const params = new URLSearchParams({ name: fullName, birthDate, gender, address });
         const res = await fetch(`/api/analyze-groq?${params.toString()}`);
         const data = await res.json();
-
         if (!data.success) throw new Error(data.error || 'เกิดข้อผิดพลาด');
         setResult(data.data);
       } catch (err: unknown) {
@@ -89,22 +88,35 @@ export default function AiAnalysisPage() {
     fetchAnalysis();
   }, [fullName, birthDate, gender, address]);
 
+  // ✅ ส่งไปหน้า /checkout/package พร้อม query
+  const handleSelectPackage = () => {
+    const params = new URLSearchParams({
+      fullName,
+      birthDate,
+      phone,
+      address,
+      gender,
+      theme,
+      ai: 'true',
+    });
+    router.push(`/checkout/package?${params.toString()}`);
+  };
+
   return (
     <div className="relative h-screen w-screen overflow-hidden">
-      {/* พื้นหลัง */}
+      {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#1A103D] to-[#3B2D56] opacity-90 z-0" />
       <div className="absolute inset-0 bg-stars-pattern opacity-20 z-0" />
 
       <motion.main className="relative z-10 h-full w-full px-4 font-serif text-white pt-16 flex justify-center items-start">
-
         <div className="relative bg-gradient-to-br from-[#2A1B45]/90 to-[#3B2D56]/90 rounded-3xl shadow-2xl border border-purple-800 w-full max-w-4xl p-6 md:p-10 space-y-8 backdrop-blur-lg max-h-[95vh] overflow-y-auto scrollbar-thin scrollbar-thumb-purple-700 scrollbar-track-transparent">
 
-          {/* หัวข้อหลัก */}
+          {/* Title */}
           <h1 className="text-4xl md:text-5xl font-extrabold text-center text-yellow-200 tracking-wide drop-shadow-[0_0_12px_rgba(255,255,100,0.8)] animate-pulse">
             🔮 ผลการวิเคราะห์ดวง
           </h1>
 
-          {/* แสดงข้อมูลผู้ใช้ */}
+          {/* User Info */}
           <motion.section
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -124,7 +136,7 @@ export default function AiAnalysisPage() {
             </div>
           </motion.section>
 
-          {/* โหลดข้อมูล */}
+          {/* Loading */}
           {loading && (
             <div className="flex items-center justify-center gap-2 text-yellow-300 text-sm animate-pulse">
               <Loader2 className="w-5 h-5 animate-spin" />
@@ -132,7 +144,7 @@ export default function AiAnalysisPage() {
             </div>
           )}
 
-          {/* แสดง error */}
+          {/* Error */}
           {error && (
             <div className="flex items-center gap-2 text-red-400 text-sm">
               <AlertCircle className="w-5 h-5" />
@@ -140,10 +152,10 @@ export default function AiAnalysisPage() {
             </div>
           )}
 
-          {/* แสดงผลลัพธ์ */}
+          {/* Result */}
           {!loading && result && (
             <div className="grid gap-6 text-sm text-purple-100">
-              {/* บุคลิกภาพ */}
+              {/* Summary */}
               {result.summary && (
                 <SectionCard
                   title={
@@ -159,7 +171,7 @@ export default function AiAnalysisPage() {
                 </SectionCard>
               )}
 
-              {/* ดวงการเงิน / วอลเปเปอร์ */}
+              {/* Fortune + Recommended Wallpaper */}
               {(result.fortune || result.recommendedWallpaper) && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {result.fortune && (
@@ -188,7 +200,7 @@ export default function AiAnalysisPage() {
                 </div>
               )}
 
-              {/* raw result */}
+              {/* Raw text */}
               {result.raw && (
                 <SectionCard
                   title="📜 คำตอบจาก AI (ดิบ)"
@@ -199,14 +211,14 @@ export default function AiAnalysisPage() {
                 </SectionCard>
               )}
 
-              {/* ปุ่มเลือกแพ็คเกจ */}
+              {/* Select Package Button */}
               <div className="text-center pt-6">
-                <Link
-                  href="/checkout/package"
+                <button
+                  onClick={handleSelectPackage}
                   className="inline-block bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500 hover:brightness-110 text-gray-900 font-semibold py-3 px-6 rounded-full shadow-lg transition-all"
                 >
                   🔆 เลือกการ์ดเสริมพลัง
-                </Link>
+                </button>
               </div>
             </div>
           )}

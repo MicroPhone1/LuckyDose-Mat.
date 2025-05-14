@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const packages = [
   {
@@ -36,12 +36,16 @@ const packages = [
   },
 ];
 
-
 export default function PackageSelectPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // ดึงค่าจาก query string เดิม (เช่น ai=true&fullName=... ฯลฯ)
+  const preservedParams = new URLSearchParams(searchParams.toString());
 
   const handleSelect = (pkgId: string) => {
-    router.push(`/checkout/payment?package=${pkgId}`);
+    preservedParams.set('package', pkgId);
+    router.push(`/checkout/payment?${preservedParams.toString()}`);
   };
 
   return (
@@ -57,26 +61,26 @@ export default function PackageSelectPage() {
               key={pkg.id}
               onClick={() => handleSelect(pkg.id)}
               className={`
-                w-full px-5 py-5 rounded-3xl border transition-all
-                flex justify-between items-center shadow-md
-                focus:outline-none focus:ring-2 focus:ring-offset-2
+                w-full px-6 py-6 rounded-3xl border transition-all
+                flex justify-between items-center shadow-xl hover:shadow-2xl
+                hover:scale-[1.02] active:scale-100
                 ${
                   pkg.highlighted
                     ? 'bg-gradient-to-r from-[#B31313] to-[#DA2D2D] text-white border-transparent focus:ring-red-300'
                     : 'bg-[#FFF3B0] text-gray-900 border-yellow-300 focus:ring-yellow-400'
                 }
-                hover:scale-[1.02] hover:shadow-xl active:scale-100
+                focus:outline-none focus:ring-2 focus:ring-offset-2
               `}
               aria-label={`เลือกแพ็คเกจ ${pkg.title}`}
             >
               <div className="flex items-center gap-3 text-left">
-                <span className="text-3xl">{pkg.icon}</span>
+                <span className="text-4xl">{pkg.icon}</span>
                 <span className="text-base md:text-lg font-semibold leading-tight">
                   {pkg.title}
                 </span>
               </div>
-              <div className="text-right text-sm font-medium whitespace-nowrap">
-                {pkg.price} บาท
+              <div className="text-right text-sm font-bold whitespace-nowrap">
+                {pkg.price.toLocaleString()} บาท
               </div>
             </button>
           ))}
